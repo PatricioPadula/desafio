@@ -1,16 +1,19 @@
 import { Router } from "express";
-import { ProductManager } from "../dao/productManager.js"
+/* import { ProductManager } from "../dao/managers/fileSystem/productsFile.js" */
+/* const productService = new ProductManager("products.json"); */
 
-const productService = new ProductManager("products.json");
+import { ProductsMongo } from "../dao/managers/mongo/productsMongo.js";
 
-const validateFields = (req,res,next) =>{
+const productService = new ProductsMongo();
+
+/* const validateFields = (req,res,next) =>{
     const newProduct = req.body;
     if(!newProduct.title || !newProduct.description || !newProduct.code || !newProduct.price || !newProduct.status || !newProduct.stock || !newProduct.category ){
         return res.json({status: "error", message:"campos incompletos"})
     } else{
         next();
     }
-}
+} */
 
 const router = Router();
 
@@ -33,7 +36,7 @@ router.get("/", async(req,res)=>{
 
 router.get("/:pid", async(req,res)=>{
     try {
-        const pid = parseInt(req.params.pid);
+        const pid = req.params.pid;
         const productosId = await productService.getById(pid);
         res.json({status:"success", data:productosId});
     } catch (error) {
@@ -42,7 +45,7 @@ router.get("/:pid", async(req,res)=>{
     
 });
 
-router.post("/", validateFields, async(req,res)=>{
+router.post("/", async(req,res)=>{
     try {
         const newProduct = req.body;
         const productCreated = await productService.save(newProduct);
@@ -52,13 +55,13 @@ router.post("/", validateFields, async(req,res)=>{
     }
 });
 
-router.put("/:pid", validateFields, (req,res) =>{
+router.put("/:pid", (req,res) =>{
     const newProduct = req.body;    
 });
 
 router.delete("/:pid", async(req,res)=>{
     try {
-        const pid = parseInt(req.params.pid);
+        const pid = req.params.pid;
         const productosId = await productService.deleteProd(pid);
         console.log(productosId);
         res.json({status:"success", message:"el producto se eliminó con éxito"});

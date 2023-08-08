@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { CartManager } from "../dao/cartManager.js"
-import { ProductManager } from "../dao/productManager.js";
+/* import { CartManager } from "../dao/cartManager.js"
+import { ProductManager } from "../dao/productManager.js"; */
+import { CartsMongo } from "../dao/managers/mongo/cartsMongo.js";
+import { ProductsMongo } from "../dao/managers/mongo/productsMongo.js";
 
-const cartService = new CartManager("carts.json")
-const productService = new ProductManager("products.json")
+const cartService = new CartsMongo()
+const productService = new ProductsMongo()
 
 const router = Router();
 
@@ -27,7 +29,7 @@ router.post("/", async(req,res) => {
 
 router.get("/:cid", async(req,res) =>{
     try {
-        const cartId = parseInt(req.params.cid);
+        const cartId = req.params.cid;
         const cart = await cartService.getById(cartId);
         if(cart){
             res.json({status:"success", data:cart ,message:"carrito encontrado"})
@@ -41,8 +43,8 @@ router.get("/:cid", async(req,res) =>{
 
 router.post("/:cid/product/:pid", async (req,res)=>{
     try {
-        const cartId = parseInt(req.params.cid);
-        const productId = parseInt(req.params.pid);
+        const cartId = req.params.cid;
+        const productId = req.params.pid;
 
         const cart = await cartService.getById(cartId);
         if(cart){
